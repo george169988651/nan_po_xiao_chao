@@ -17,6 +17,7 @@ public class NanPoXiaoChaoApplication {
 
     public static void main(String[] args) {
 
+
         ConfigurableApplicationContext applicationContext = SpringApplication.run(NanPoXiaoChaoApplication.class, args);
 
         log.info("=======================================");
