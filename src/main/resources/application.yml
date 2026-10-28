@@ -1,0 +1,103 @@
+server:
+  port: 8081
+  tomcat:
+    # GET 查询串里的中文(如 /order/search?dish=回锅肉)按 UTF-8 解码
+    uri-encoding: UTF-8
+  servlet:
+    # multipart 文本字段(message)按 UTF-8 解码,否则中文会变成 ?
+    encoding:
+      charset: UTF-8
+      force: true
+spring:
+  application:
+    name: nan_po_xiao_chao
+  #====================================
+  datasource:
+    url: jdbc:h2:mem:nan_po_db;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      schema-locations: classpath*:schema.sql
+      data-locations: classpath*:data.sql
+      platform: h2
+      continue-on-error: false
+      mode: always
+      encoding: UTF-8
+  #===================================
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY}
+      base-url: https://api.deepseek.com
+      chat:
+        model: deepseek-v4-pro
+        temperature: 0.9
+    chat:
+      memory:
+        repository:
+          jdbc:
+            continue-on-error: true
+            platform: h2
+            schema: classpath*:schema.sql
+            initialize-schema: always
+# ollama本地部署
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: deepseek-r1:7b
+        temperature: 0.7
+# Qwen(通义千问):走 DashScope 的 OpenAI 兼容端点,由 spring-ai-starter-model-openai 自动装配
+# (原来的 spring.ai.qwen.* 是手写 DashScopeApi 时用的;那条路在 Spring AI 2.0.1 上走不通,见 pom 注释)
+    openai:
+      api-key: ${DASHSCOPE_API_KEY}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      chat:
+        options:
+          model: qwen3.8-flash
+          temperature: 0.7
+    # 第20课:MCP Server——把本店工具开放给支持 MCP 的 AI 客户端
+    mcp:
+      server:
+        name: nanpo-xiaochao
+        version: 1.0.0
+        # 只注册 McpConfig 里显式声明的工具,避免把 AiTool 里依赖 ToolContext 的工具也扫进来
+        annotation-scanner:
+          enabled: false
+  http:
+    clients:
+      connect-timeout: 60s
+      read-timeout: 60s
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
+  profiles:
+    active: prod
+#====================================
+# 菜品图片本地目录(上传落盘与 /files/** 静态访问共用)
+nanpo:
+  image:
+    dir: src/main/resources/image
+#====================================
+# 阿里云 OSS(菜品照片存储)
+aliyun:
+  oss:
+    # SDK 上传必须用 OSS 区域端点;自定义域名只能用于公网访问,不能作 endpoint
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: ${OSS_ACCESS_KEY_ID}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+    bucket-name: nan-po-xiao-chao
+#====================================
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+logging:
+  level:
+    com.cdutetc.nan_po_xiao_chao: info
+    com.cdutetc.nan_po_xiao_chao.mapper: debug
+#====================================

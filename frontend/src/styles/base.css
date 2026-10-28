@@ -1,0 +1,113 @@
+/*
+ * 南坡小炒 · 全局样式与设计变量
+ *
+ * 风格约定:简洁克制。
+ *   —— 不使用阴影、渐变、动画、3D 与装饰性图形;
+ *   —— 全站只用一种强调色(品牌橙),其余交给中性灰阶和留白表达层级。
+ * 新增页面请优先复用这里的变量,不要另起一套颜色。
+ */
+
+:root {
+  /* 中性色阶:层级靠颜色深浅和间距区分,不靠阴影 */
+  --npc-bg: #f7f8fa;
+  --npc-surface: #ffffff;
+  --npc-border: #e5e6eb;
+  --npc-border-strong: #d9dbe0;
+  --npc-text: #1d2129;
+  --npc-text-2: #4e5969;
+  --npc-text-3: #86909c;
+
+  /* 唯一强调色 */
+  --npc-accent: #e6501e;
+
+  /* 统一圆角与间距 */
+  --npc-radius: 4px;
+  --npc-gap: 16px;
+  --npc-header-h: 56px;
+
+  --npc-font: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+/*
+ * 覆写 Element Plus 的变量。
+ * 这里一次性把阴影全部置空 —— 组件里就不必逐个写 shadow="never" 了。
+ */
+:root {
+  --el-font-family: var(--npc-font);
+
+  --el-box-shadow: none;
+  --el-box-shadow-light: none;
+  --el-box-shadow-lighter: none;
+  --el-box-shadow-dark: none;
+
+  --el-border-radius-base: var(--npc-radius);
+  --el-border-radius-small: 3px;
+
+  /* 单一强调色:把默认蓝色主色整体换成品牌橙,含明暗衍生色 */
+  --el-color-primary: var(--npc-accent);
+  --el-color-primary-light-3: #ee8562;
+  --el-color-primary-light-5: #f3a88f;
+  --el-color-primary-light-7: #f8cbbc;
+  --el-color-primary-light-8: #fadcd2;
+  --el-color-primary-light-9: #fdeee9;
+  --el-color-primary-dark-2: #b84018;
+
+  --el-text-color-primary: var(--npc-text);
+  --el-text-color-regular: var(--npc-text-2);
+  --el-text-color-secondary: var(--npc-text-3);
+  --el-text-color-placeholder: var(--npc-text-3);
+  --el-border-color: var(--npc-border);
+  --el-border-color-light: var(--npc-border);
+  --el-border-color-lighter: var(--npc-border);
+  --el-fill-color-blank: var(--npc-surface);
+}
+
+/* ---- 基础重置 ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--npc-font);
+  font-size: 14px;
+  color: var(--npc-text);
+  background-color: var(--npc-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- 组件级收敛 ---- */
+
+/* 卡片只留一条描边,不要投影 */
+.el-card {
+  border-color: var(--npc-border);
+}
+
+/* 菜单:选中态用强调色文字 + 浅底,不做位移或放大 */
+.el-menu {
+  --el-menu-bg-color: var(--npc-surface);
+  --el-menu-hover-bg-color: var(--npc-bg);
+  --el-menu-active-color: var(--npc-accent);
+}
+
+/* el-empty 默认会渲染一张较大的插画,与"禁止装饰元素"冲突,这里统一隐去 */
+.el-empty__image {
+  display: none;
+}
+
+.el-empty {
+  padding: 32px 0;
+}
+
+.el-empty__description {
+  margin-top: 0;
+}

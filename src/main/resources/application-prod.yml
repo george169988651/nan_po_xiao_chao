@@ -1,0 +1,89 @@
+server:
+  port: 8081
+  tomcat:
+    # GET 查询串里的中文(如 /order/search?dish=回锅肉)按 UTF-8 解码
+    uri-encoding: UTF-8
+spring:
+  application:
+    name: nan_po_xiao_chao
+  #==================mysql 数据库==================
+  datasource:
+    # 主机端口必须显式写:jdbc:mysql:///db 是省略主机,隐含 localhost,应用和库不在同一台机器就连不上
+    url: jdbc:mysql://mysql:3306/nan_po_xiao_chao?useUnicode=true&characterEncoding=UTF-8&connectionTimeZone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: ${MYSQL_USERNAME:root}
+    # 密码不落盘,启动前设环境变量 MYSQL_PASSWORD
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # 上线环境不开 H2 控制台
+  h2:
+    console:
+      enabled: false
+  sql:
+    init:
+      # schema.sql 全是 CREATE TABLE IF NOT EXISTS,每次启动重跑安全;
+      # data.sql 是纯 INSERT,在 MySQL 上第二次启动必撞唯一键,所以 prod 不灌种子数据
+      mode: always
+      schema-locations: classpath*:schema.sql
+      data-locations: []
+      platform: mysql
+      encoding: UTF-8
+  #===================================
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY}
+      base-url: https://api.deepseek.com
+      chat:
+        model: deepseek-v4-pro
+        temperature: 0.9
+    chat:
+      memory:
+        repository:
+          jdbc:
+            # 记忆表由上面的 schema.sql 统一创建,这里不再跑一遍,避免两套初始化重复执行
+            initialize-schema: never
+    openai:
+      api-key: ${DASHSCOPE_API_KEY}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      chat:
+        options:
+          model: qwen3.8-flash
+          temperature: 0.7
+    mcp:
+      server:
+        name: nanpo-xiaochao
+        version: 1.0.0
+
+        annotation-scanner:
+          enabled: false
+  http:
+    clients:
+      connect-timeout: 60s
+      read-timeout: 60s
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
+#====================================
+# 菜品图片本地目录(上传落盘与 /files/** 静态访问共用)
+nanpo:
+  image:
+    dir: /data/nanpo/images
+#====================================
+# 阿里云 OSS(菜品照片存储)
+aliyun:
+  oss:
+    # SDK 上传必须用 OSS 区域端点;自定义域名只能用于公网访问,不能作 endpoint
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: ${OSS_ACCESS_KEY_ID}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+    bucket-name: nan-po-xiao-chao
+#====================================
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+logging:
+  level:
+    com.cdutetc.nan_po_xiao_chao: info
+    # 上线不打 SQL:debug 会把每条语句和参数都刷进日志
+    com.cdutetc.nan_po_xiao_chao.mapper: info
+#====================================

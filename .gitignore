@@ -1,0 +1,33 @@
+# ============================================================
+# 只提交源代码。
+# 先忽略所有，再按下面的白名单逐项放行；
+# Docker、部署、文档、图片、构建产物、IDE 配置、密钥一律不提交。
+# ============================================================
+/*
+
+# --- 仓库元数据 ---
+!/.gitignore
+!/.gitattributes
+
+# --- 后端构建与源码 ---
+!/pom.xml
+!/mvnw
+!/mvnw.cmd
+!/.mvn/
+/.mvn/wrapper/maven-wrapper.jar
+!/src/
+
+# 上传的菜品图片属于运行时数据，不提交
+/src/main/resources/image/
+
+# --- 前端源码与构建配置 ---
+!/frontend/
+/frontend/*
+!/frontend/src/
+!/frontend/.gitignore
+!/frontend/index.html
+!/frontend/package.json
+!/frontend/package-lock.json
+!/frontend/pnpm-lock.yaml
+!/frontend/pnpm-workspace.yaml
+!/frontend/vite.config.js
