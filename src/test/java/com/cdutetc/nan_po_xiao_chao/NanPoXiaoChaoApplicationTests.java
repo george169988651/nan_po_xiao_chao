@@ -52,7 +52,7 @@ class NanPoXiaoChaoApplicationTests {
 
     /**
      * 携带图片调用:按请求覆盖成视觉模型 qwen3-vl-plus,走同一套 DashScope OpenAI 兼容端点。
-     * 用项目里真实的一张菜品/大屏截图验证模型确实能读图,并走流式(与 /ai/chat/stream/image 的契约一致)。
+     * 用项目里真实的一张菜品/大屏截图验证模型确实能读图,并走流式(与 /ai/chat/stream/image 的契约一致)。spring-ai
      */
     @Test
     void testQwenImageChat() {
