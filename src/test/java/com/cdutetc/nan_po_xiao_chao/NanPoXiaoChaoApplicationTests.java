@@ -46,6 +46,8 @@ class NanPoXiaoChaoApplicationTests {
                 .content();
         System.out.println("QWEN REPLY >>> " + content);
         assertNotNull(content, "千问返回内容为空");
+
+
     }
 
     /**
