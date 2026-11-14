@@ -1,4 +1,4 @@
-# 后端构建上下文只需要 pom.xml + src,其余一律不进镜像
+# 后端构建上下文:只需要 target 里的 jar
 .git
 .idea
 .zcode
@@ -7,7 +7,9 @@
 docs
 frontend
 production
-target
+# target 里只放行打好的 jar,classes 等中间产物不进上下文
+target/*
+!target/*.jar
 *.md
 HELP.md
 mvnw

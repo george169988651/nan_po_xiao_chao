@@ -3,15 +3,10 @@ FROM eclipse-temurin:17-jre
 LABEL authors="George"
 LABEL description="南坡小炒 Dockerfile"
 
-# [问题10] 容器默认是 UTC,不设时区的话 LocalDateTime.now() 比北京时间早 8 小时
+# 容器默认是 UTC,不设时区的话 LocalDateTime.now() 比北京时间早 8 小时
 ENV TZ=Asia/Shanghai
 # 中文日志不乱码
 ENV LANG=C.UTF-8
-
-# curl 供 docker-compose healthcheck 探活 /actuator/health 用
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

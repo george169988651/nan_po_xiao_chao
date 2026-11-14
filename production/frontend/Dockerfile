@@ -1,4 +1,4 @@
-FROM nginx:1.28-alpine
+FROM nginx:1.25.5-alpine
 
 # 删默认页面
 RUN rm -rf /etc/nginx/html/*
