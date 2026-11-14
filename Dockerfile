@@ -1,7 +1,26 @@
 # ===== 阶段一:构建——容器内用 Maven 编译,不依赖宿主机预先打好的 jar =====
 FROM maven:3.9-eclipse-temurin-17 AS builder
 
+# 国内构建默认走阿里云 Maven 镜像;要换回官方源:
+#   docker compose build --build-arg MAVEN_MIRROR_URL=
+ARG MAVEN_MIRROR_URL=https://maven.aliyun.com/repository/public
+
 WORKDIR /app
+
+# 配 Maven 镜像,加速容器内依赖下载
+RUN if [ -n "$MAVEN_MIRROR_URL" ]; then \
+        mkdir -p /root/.m2; \
+        printf '%s\n' \
+            '<settings>' \
+            '  <mirrors>' \
+            '    <mirror>' \
+            '      <id>cn-mirror</id>' \
+            '      <mirrorOf>central</mirrorOf>' \
+            "      <url>${MAVEN_MIRROR_URL}</url>" \
+            '    </mirror>' \
+            '  </mirrors>' \
+            '</settings>' > /root/.m2/settings.xml; \
+    fi
 
 # 先只拷 pom 下载依赖:这一层只要 pom 不变就命中缓存,改代码重建时快得多
 COPY pom.xml .
