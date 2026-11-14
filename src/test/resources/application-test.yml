@@ -1,0 +1,12 @@
+# 测试专用配置:给上下文提供占位密钥,避免 mvn package 依赖本机环境变量 / .env。
+# 真正请求外部 AI 的测试默认跳过,需要时设置 RUN_AI_TESTS=true 并配置真实 key 再运行。
+spring:
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:test-deepseek-key}
+    openai:
+      api-key: ${DASHSCOPE_API_KEY:test-dashscope-key}
+aliyun:
+  oss:
+    access-key-id: ${OSS_ACCESS_KEY_ID:test-oss-id}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET:test-oss-secret}

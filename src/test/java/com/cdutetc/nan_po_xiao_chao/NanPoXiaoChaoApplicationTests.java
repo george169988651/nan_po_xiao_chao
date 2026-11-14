@@ -7,9 +7,11 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @SpringBootTest
+// 用 test profile 提供占位密钥,避免依赖本机的 .env / 环境变量
+@ActiveProfiles("test")
 class NanPoXiaoChaoApplicationTests {
 
     // Qwen 现在由 spring-ai-starter-model-openai 按 spring.ai.openai.* 自动装配,
@@ -33,7 +37,9 @@ class NanPoXiaoChaoApplicationTests {
     @Qualifier("qwen")
     private ChatClient qwenChatClient;
 
+    // 真实调用外部 AI 的集成测试:默认跳过,避免 mvn package 依赖网络和真实密钥
     @Test
+    @EnabledIfEnvironmentVariable(named = "RUN_AI_TESTS", matches = "true")
     void testQwenChat() {
         String content = qwenChatClient.prompt()
                 .user(new Consumer<ChatClient.PromptUserSpec>() {
@@ -55,6 +61,7 @@ class NanPoXiaoChaoApplicationTests {
      * 用项目里真实的一张菜品/大屏截图验证模型确实能读图,并走流式(与 /ai/chat/stream/image 的契约一致)。spring-ai
      */
     @Test
+    @EnabledIfEnvironmentVariable(named = "RUN_AI_TESTS", matches = "true")
     void testQwenImageChat() {
         FileSystemResource image = new FileSystemResource(
                 "src/main/resources/image/2026-10-13/69db25ac-2e59-495e-845a-15173364f0ff.png");
