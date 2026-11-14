@@ -1,0 +1,15 @@
+# 后端构建上下文只需要 pom.xml + src,其余一律不进镜像
+.git
+.idea
+.zcode
+*.iml
+.env
+docs
+frontend
+production
+target
+*.md
+HELP.md
+mvnw
+mvnw.cmd
+.mvn

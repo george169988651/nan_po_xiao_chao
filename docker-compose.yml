@@ -1,0 +1,76 @@
+services:
+  nan_po_xiao_chao:
+    build: .
+    ports:
+      - "8081:8081"
+    container_name: nan_po_xiao_chao
+    restart: unless-stopped
+    # .env 不会自动进容器,必须显式声明;否则启动就报 Could not resolve placeholder
+    env_file: .env
+    environment:
+      #  与 Dockerfile 里的 TZ 双保险
+      TZ: Asia/Shanghai
+    #  MySQL 8 首次初始化要几十秒,不等就绪的话 app 会因为连不上库直接退出
+    depends_on:
+      mysql:
+        condition: service_healthy
+    # 镜像里装了 curl;探活 /actuator/health,数据库/应用没就绪时前端不会提前起
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    volumes:
+      #  上传的菜品图片要落到宿主机,否则容器一重建全丢
+      - /data/nanpo/images:/data/nanpo/images
+    networks:
+      - back
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      #  容器 root 密码和 app 的 MYSQL_PASSWORD 用同一个值,避免密码不一致连不上;
+      #  :? 让 .env 漏配时直接报清晰错误,而不是拿空密码启动 mysql 后失败
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required, check .env}
+      MYSQL_DATABASE: nan_po_xiao_chao
+    volumes:
+      - /data/mysql:/var/lib/mysql
+      # 不要把空目录挂到 /etc/mysql/conf.d:会盖掉镜像自带的 docker.cnf(skip-name-resolve 等)。
+      # 需要自定义配置时,改成挂单个文件,例如 /data/mysql-conf/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - back
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "9820:80"
+    container_name: frontend
+    restart: unless-stopped
+    depends_on:
+      nan_po_xiao_chao:
+        condition: service_healthy
+    # 必须加入 back 网络,否则 nginx 解析不到 nan_po_xiao_chao,反代 /api 会 502
+    networks:
+      - back
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+networks:
+  back:
+    # 不能写 internal: true —— 那个网络没有外网出口,
+    # DeepSeek / DashScope / 阿里云 OSS 会全部调不通
+    driver: bridge

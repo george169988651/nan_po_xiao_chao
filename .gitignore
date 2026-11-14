@@ -1,7 +1,7 @@
 # ============================================================
-# 只提交源代码。
+# 只提交源代码和部署配置。
 # 先忽略所有，再按下面的白名单逐项放行；
-# Docker、部署、文档、图片、构建产物、IDE 配置、密钥一律不提交。
+# 文档、图片、构建产物、IDE 配置、.env 密钥一律不提交。
 # ============================================================
 /*
 
@@ -31,3 +31,23 @@
 !/frontend/pnpm-lock.yaml
 !/frontend/pnpm-workspace.yaml
 !/frontend/vite.config.js
+!/frontend/Dockerfile
+!/frontend/.dockerignore
+!/frontend/nginx.conf
+
+# --- Docker 镜像与编排 ---
+!/Dockerfile
+!/.dockerignore
+!/docker-compose.yml
+
+# --- production 部署包：只放 Docker 配置，.env / dist / jar 仍忽略 ---
+!/production/
+/production/*
+!/production/docker-compose.yml
+!/production/back/
+/production/back/*
+!/production/back/Dockerfile
+!/production/frontend/
+/production/frontend/*
+!/production/frontend/Dockerfile
+!/production/frontend/nginx.conf

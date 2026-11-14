@@ -1,2 +1,8 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Docker/nginx 配置必须保持 LF,避免 Windows 检出成 CRLF 后构建异常
+Dockerfile text eol=lf
+*.dockerignore text eol=lf
+docker-compose.yml text eol=lf
+nginx.conf text eol=lf
